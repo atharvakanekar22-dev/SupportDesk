@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SupportDesk — Helpdesk & Support Ticket Management">
+    <title>{% block title %}SupportDesk{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+{% block body %}
+
+<div class="app-shell">
+
+    <!-- ======================================================
+         Sidebar
+    ====================================================== -->
+    <aside class="sidebar">
+        <a href="{% url 'core:dashboard' %}" class="sidebar-brand">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="3"/>
+                <path d="M8 10h8"/>
+                <path d="M8 14h5"/>
+            </svg>
+            SupportDesk
+        </a>
+
+        {% if user.is_authenticated %}
+
+        <!-- Navigation varies by role -->
+        <div class="sidebar-section">
+            <p class="sidebar-section-label">Main</p>
+            <ul class="sidebar-nav">
+                <li class="sidebar-nav-item">
+                    <a href="{% url 'core:dashboard' %}"
+                       {% if request.resolver_match.url_name == 'dashboard' %}class="active"{% endif %}>
+                        <!-- Home icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                            <polyline points="9 22 9 12 15 12 15 22"/>
+                        </svg>
+                        Dashboard
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        {% if user.role == 'ADMIN' or user.role == 'AGENT' %}
+        <div class="sidebar-section">
+            <p class="sidebar-section-label">Tickets</p>
+            <ul class="sidebar-nav">
+                <li class="sidebar-nav-item">
+                    <a href="{% url 'tickets:ticket_list' %}"
+                       {% if request.resolver_match.app_name == 'tickets' and request.resolver_match.url_name == 'ticket_list' %}class="active"{% endif %}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                        </svg>
+                        {% if user.role == 'ADMIN' %}All Tickets{% else %}Assigned Tickets{% endif %}
+                    </a>
+                </li>
+            </ul>
+        </div>
+        {% endif %}
+
+        {% if user.role == 'CUSTOMER' %}
+        <div class="sidebar-section">
+            <p class="sidebar-section-label">Support</p>
+            <ul class="sidebar-nav">
+                <li class="sidebar-nav-item">
+                    <a href="{% url 'tickets:ticket_list' %}"
+                       {% if request.resolver_match.app_name == 'tickets' and request.resolver_match.url_name == 'ticket_list' %}class="active"{% endif %}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                        </svg>
+                        My Tickets
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="{% url 'tickets:ticket_create' %}"
+                       {% if request.resolver_match.app_name == 'tickets' and request.resolver_match.url_name == 'ticket_create' %}class="active"{% endif %}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        New Ticket
+                    </a>
+                </li>
+            </ul>
+        </div>
+        {% endif %}
+
+        {% if user.role == 'ADMIN' %}
+        <div class="sidebar-section">
+            <p class="sidebar-section-label">Administration</p>
+            <ul class="sidebar-nav">
+                <li class="sidebar-nav-item">
+                    <a href="#">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                        Users
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="/admin/" target="_blank">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                            <path d="M4.93 4.93a10 10 0 0 0 0 14.14"/>
+                        </svg>
+                        Administration Portal
+                    </a>
+                </li>
+            </ul>
+        </div>
+        {% endif %}
+
+        {% endif %}{# end is_authenticated #}
+
+        <div class="sidebar-footer">
+            {% if user.is_authenticated %}
+                Signed in as <strong>{{ user.username }}</strong><br>
+                <a href="{% url 'accounts:logout' %}">Sign out</a>
+            {% endif %}
+        </div>
+    </aside>
+
+    <!-- ======================================================
+         Main area
+    ====================================================== -->
+    <div class="main-area">
+
+        <!-- Top bar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <span class="topbar-title">{% block page_title %}{% endblock %}</span>
+            </div>
+            <div class="topbar-right">
+                {% if user.is_authenticated %}
+                <div class="topbar-user">
+                    <span>{{ user.get_full_name|default:user.username }}</span>
+                    {% if user.role == 'ADMIN' %}
+                        <span class="badge-role badge-role--admin">Admin</span>
+                    {% elif user.role == 'AGENT' %}
+                        <span class="badge-role badge-role--agent">Agent</span>
+                    {% else %}
+                        <span class="badge-role badge-role--customer">Customer</span>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </header>
+
+        <!-- Content -->
+        <main class="content">
+
+            <!-- Django messages -->
+            {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                <li class="{{ message.tags }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </main>
+
+    </div><!-- /.main-area -->
+
+</div><!-- /.app-shell -->
+
+{% endblock body %}
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>

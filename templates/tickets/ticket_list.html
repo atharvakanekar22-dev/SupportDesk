@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Tickets — SupportDesk{% endblock %}
+{% block page_title %}
+    {% if user.role == 'CUSTOMER' %}My Tickets
+    {% elif user.role == 'AGENT' %}Assigned Tickets
+    {% else %}All Tickets{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="page-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+    <div>
+        <h1>
+            {% if user.role == 'CUSTOMER' %}My Support Tickets
+            {% elif user.role == 'AGENT' %}Tickets Assigned to Me
+            {% else %}System Tickets{% endif %}
+        </h1>
+        <p>{{ total_count }} ticket{{ total_count|pluralize }} found</p>
+    </div>
+    {% if user.role != 'AGENT' %}
+    <div>
+        <a href="{% url 'tickets:ticket_create' %}" class="btn btn--primary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Create Ticket
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Search & Filtering Toolbar -->
+<form method="get" class="filter-toolbar">
+    <div class="filter-item" style="flex: 1; min-width: 200px;">
+        <label for="id_q">Search</label>
+        {{ filter_form.q }}
+    </div>
+    <div class="filter-item">
+        <label for="id_status">Status</label>
+        {{ filter_form.status }}
+    </div>
+    <div class="filter-item">
+        <label for="id_priority">Priority</label>
+        {{ filter_form.priority }}
+    </div>
+    {% if filter_form.agent %}
+    <div class="filter-item">
+        <label for="id_agent">Agent</label>
+        {{ filter_form.agent }}
+    </div>
+    {% endif %}
+    <div class="filter-actions">
+        <button type="submit" class="btn btn--secondary">Filter</button>
+        <a href="{% url 'tickets:ticket_list' %}" class="btn btn--secondary" title="Reset filters">Reset</a>
+    </div>
+</form>
+
+<!-- Tickets Table -->
+<div class="table-wrapper">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th style="width: 140px;">Ticket #</th>
+                <th>Subject</th>
+                {% if user.role != 'CUSTOMER' %}
+                <th>Customer</th>
+                {% endif %}
+                <th>Assigned Agent</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th style="width: 150px;">Created</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ticket in tickets %}
+            <tr>
+                <td>
+                    <a href="{% url 'tickets:ticket_detail' ticket.pk %}" style="font-family: monospace; font-weight: 600;">
+                        {{ ticket.ticket_number }}
+                    </a>
+                </td>
+                <td>
+                    <a href="{% url 'tickets:ticket_detail' ticket.pk %}" style="font-weight: 500; color: #1e293b;">
+                        {{ ticket.subject }}
+                    </a>
+                </td>
+                {% if user.role != 'CUSTOMER' %}
+                <td>{{ ticket.customer.get_full_name|default:ticket.customer.username }}</td>
+                {% endif %}
+                <td>
+                    {% if ticket.assigned_agent %}
+                        {{ ticket.assigned_agent.get_full_name|default:ticket.assigned_agent.username }}
+                    {% else %}
+                        <span class="text-muted">—</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if ticket.priority == 'LOW' %}
+                        <span class="priority-badge priority-badge--low">Low</span>
+                    {% elif ticket.priority == 'MEDIUM' %}
+                        <span class="priority-badge priority-badge--medium">Medium</span>
+                    {% elif ticket.priority == 'HIGH' %}
+                        <span class="priority-badge priority-badge--high">High</span>
+                    {% elif ticket.priority == 'CRITICAL' %}
+                        <span class="priority-badge priority-badge--critical">Critical</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if ticket.status == 'OPEN' %}
+                        <span class="status-badge status-badge--open">Open</span>
+                    {% elif ticket.status == 'ASSIGNED' %}
+                        <span class="status-badge status-badge--assigned">Assigned</span>
+                    {% elif ticket.status == 'IN_PROGRESS' %}
+                        <span class="status-badge status-badge--inprogress">In Progress</span>
+                    {% elif ticket.status == 'RESOLVED' %}
+                        <span class="status-badge status-badge--resolved">Resolved</span>
+                    {% elif ticket.status == 'CLOSED' %}
+                        <span class="status-badge status-badge--closed">Closed</span>
+                    {% endif %}
+                </td>
+                <td class="text-muted text-sm">
+                    {{ ticket.created_at|date:"M d, Y H:i" }}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" style="text-align: center; padding: 36px 20px; color: #64748b;">
+                    No tickets found matching your criteria.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

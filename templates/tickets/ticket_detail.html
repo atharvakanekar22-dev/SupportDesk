@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+
+{% block title %}{{ ticket.ticket_number }} — {{ ticket.subject }} — SupportDesk{% endblock %}
+{% block page_title %}Ticket Details{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 16px;">
+    <a href="{% url 'tickets:ticket_list' %}" style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: #64748b; text-decoration: none;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        Back to tickets
+    </a>
+</div>
+
+<div class="ticket-detail-layout">
+
+    <!-- ==========================================
+         Main Column: Description, Attachments, Comments
+         ========================================== -->
+    <div class="ticket-main">
+
+        <!-- Ticket Header & Description -->
+        <div class="ticket-header-card">
+            <div class="ticket-meta-row">
+                <span class="ticket-number-tag">{{ ticket.ticket_number }}</span>
+                {% if ticket.priority == 'LOW' %}
+                    <span class="priority-badge priority-badge--low">Low</span>
+                {% elif ticket.priority == 'MEDIUM' %}
+                    <span class="priority-badge priority-badge--medium">Medium</span>
+                {% elif ticket.priority == 'HIGH' %}
+                    <span class="priority-badge priority-badge--high">High</span>
+                {% elif ticket.priority == 'CRITICAL' %}
+                    <span class="priority-badge priority-badge--critical">Critical</span>
+                {% endif %}
+
+                {% if ticket.status == 'OPEN' %}
+                    <span class="status-badge status-badge--open">Open</span>
+                {% elif ticket.status == 'ASSIGNED' %}
+                    <span class="status-badge status-badge--assigned">Assigned</span>
+                {% elif ticket.status == 'IN_PROGRESS' %}
+                    <span class="status-badge status-badge--inprogress">In Progress</span>
+                {% elif ticket.status == 'RESOLVED' %}
+                    <span class="status-badge status-badge--resolved">Resolved</span>
+                {% elif ticket.status == 'CLOSED' %}
+                    <span class="status-badge status-badge--closed">Closed</span>
+                {% endif %}
+            </div>
+
+            <h1 class="ticket-subject-title">{{ ticket.subject }}</h1>
+
+            <div class="ticket-body-content">
+                {{ ticket.description|linebreaks }}
+            </div>
+        </div>
+
+        <!-- Attachments Section -->
+        <div class="card">
+            <h2 class="card-title">Attachments ({{ attachments.count }})</h2>
+
+            {% if attachments %}
+            <div style="margin-bottom: 16px;">
+                {% for att in attachments %}
+                <div class="attachment-item">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #64748b;">
+                            <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+                        </svg>
+                        <a href="{{ att.file.url }}" target="_blank" style="font-weight: 500;">
+                            {{ att.original_filename }}
+                        </a>
+                        <span class="text-muted text-sm">({{ att.file.size|filesizeformat }})</span>
+                    </div>
+                    <div class="text-muted text-sm">
+                        by {{ att.uploaded_by.get_full_name|default:att.uploaded_by.username }} &middot; {{ att.uploaded_at|date:"M d, H:i" }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted text-sm mb-16">No attachments uploaded for this ticket.</p>
+            {% endif %}
+
+            {% if attachment_form %}
+            <form method="post" action="{% url 'tickets:ticket_add_attachment' ticket.pk %}" enctype="multipart/form-data" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #f1f5f9;">
+                {% csrf_token %}
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 200px;">
+                        {{ attachment_form.file }}
+                    </div>
+                    <button type="submit" class="btn btn--secondary btn--sm">
+                        Upload File
+                    </button>
+                </div>
+                <p class="text-muted text-sm mt-4">Supported: PDF, Docs, Images, Logs, Archives (Max 10 MB)</p>
+            </form>
+            {% endif %}
+        </div>
+
+        <!-- Comments Section -->
+        <div class="card">
+            <h2 class="card-title">Conversation & Notes ({{ comments.count }})</h2>
+
+            {% if comments %}
+            <div style="margin-bottom: 20px;">
+                {% for comment in comments %}
+                <div class="comment-card">
+                    <div class="comment-header">
+                        <span class="comment-author">
+                            {{ comment.author.get_full_name|default:comment.author.username }}
+                            {% if comment.author.role == 'ADMIN' %}
+                                <span class="badge-role badge-role--admin" style="font-size: 0.7rem; padding: 1px 6px;">Admin</span>
+                            {% elif comment.author.role == 'AGENT' %}
+                                <span class="badge-role badge-role--agent" style="font-size: 0.7rem; padding: 1px 6px;">Agent</span>
+                            {% else %}
+                                <span class="badge-role badge-role--customer" style="font-size: 0.7rem; padding: 1px 6px;">Customer</span>
+                            {% endif %}
+                        </span>
+                        <span>{{ comment.created_at|date:"M d, Y H:i" }}</span>
+                    </div>
+                    <div class="comment-body">
+                        {{ comment.content|linebreaks }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted text-sm mb-16">No comments posted yet.</p>
+            {% endif %}
+
+            {% if comment_form %}
+            <form method="post" action="{% url 'tickets:ticket_add_comment' ticket.pk %}" style="margin-top: 16px;">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="form-label" for="{{ comment_form.content.id_for_label }}">Leave a reply</label>
+                    {{ comment_form.content }}
+                </div>
+                <button type="submit" class="btn btn--primary">
+                    Post Comment
+                </button>
+            </form>
+            {% elif is_closed %}
+            <div class="notice notice--warning mt-16">
+                This ticket has been closed. Comments are disabled.
+            </div>
+            {% endif %}
+        </div>
+
+    </div><!-- /.ticket-main -->
+
+    <!-- ==========================================
+         Sidebar: Properties, Assignment, Status, Audit Trail
+         ========================================== -->
+    <div class="ticket-sidebar">
+
+        <!-- Properties Card -->
+        <div class="card">
+            <h2 class="card-title">Properties</h2>
+            <ul class="sidebar-prop-list">
+                <li class="sidebar-prop-item">
+                    <span class="sidebar-prop-label">Status</span>
+                    <span class="sidebar-prop-val">
+                        {% if ticket.status == 'OPEN' %}
+                            <span class="status-badge status-badge--open">Open</span>
+                        {% elif ticket.status == 'ASSIGNED' %}
+                            <span class="status-badge status-badge--assigned">Assigned</span>
+                        {% elif ticket.status == 'IN_PROGRESS' %}
+                            <span class="status-badge status-badge--inprogress">In Progress</span>
+                        {% elif ticket.status == 'RESOLVED' %}
+                            <span class="status-badge status-badge--resolved">Resolved</span>
+                        {% elif ticket.status == 'CLOSED' %}
+                            <span class="status-badge status-badge--closed">Closed</span>
+                        {% endif %}
+                    </span>
+                </li>
+                <li class="sidebar-prop-item">
+                    <span class="sidebar-prop-label">Priority</span>
+                    <span class="sidebar-prop-val">
+                        {% if ticket.priority == 'LOW' %}
+                            <span class="priority-badge priority-badge--low">Low</span>
+                        {% elif ticket.priority == 'MEDIUM' %}
+                            <span class="priority-badge priority-badge--medium">Medium</span>
+                        {% elif ticket.priority == 'HIGH' %}
+                            <span class="priority-badge priority-badge--high">High</span>
+                        {% elif ticket.priority == 'CRITICAL' %}
+                            <span class="priority-badge priority-badge--critical">Critical</span>
+                        {% endif %}
+                    </span>
+                </li>
+                <li class="sidebar-prop-item">
+                    <span class="sidebar-prop-label">Customer</span>
+                    <span class="sidebar-prop-val">{{ ticket.customer.get_full_name|default:ticket.customer.username }}</span>
+                </li>
+                <li class="sidebar-prop-item">
+                    <span class="sidebar-prop-label">Assigned Agent</span>
+                    <span class="sidebar-prop-val">
+                        {% if ticket.assigned_agent %}
+                            {{ ticket.assigned_agent.get_full_name|default:ticket.assigned_agent.username }}
+                        {% else %}
+                            <span class="text-muted">Unassigned</span>
+                        {% endif %}
+                    </span>
+                </li>
+                <li class="sidebar-prop-item">
+                    <span class="sidebar-prop-label">Created</span>
+                    <span class="sidebar-prop-val">{{ ticket.created_at|date:"M d, Y H:i" }}</span>
+                </li>
+                <li class="sidebar-prop-item">
+                    <span class="sidebar-prop-label">Last Updated</span>
+                    <span class="sidebar-prop-val">{{ ticket.updated_at|date:"M d, Y H:i" }}</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Assignment (Admin Only) -->
+        {% if assign_form %}
+        <div class="card">
+            <h2 class="card-title">Assign Agent</h2>
+            <form method="post" action="{% url 'tickets:ticket_assign' ticket.pk %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    {{ assign_form.assigned_agent }}
+                </div>
+                <button type="submit" class="btn btn--secondary btn--full btn--sm">
+                    {% if ticket.assigned_agent %}Reassign Ticket{% else %}Assign Ticket{% endif %}
+                </button>
+            </form>
+        </div>
+        {% endif %}
+
+        <!-- Status Transition (Agent or Admin) -->
+        {% if status_form %}
+        <div class="card">
+            <h2 class="card-title">Workflow Transition</h2>
+            {% if can_transition %}
+            <form method="post" action="{% url 'tickets:ticket_change_status' ticket.pk %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    {{ status_form.new_status }}
+                </div>
+                <button type="submit" class="btn btn--primary btn--full btn--sm">
+                    Advance Status
+                </button>
+            </form>
+            {% else %}
+            <p class="text-muted text-sm">
+                {% if is_closed %}
+                    This ticket is <strong>Closed</strong> (terminal state).
+                {% else %}
+                    No valid transitions from current status.
+                {% endif %}
+            </p>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Audit Trail / History -->
+        <div class="card">
+            <h2 class="card-title">Audit Trail</h2>
+            <ul class="history-list">
+                {% for item in history %}
+                <li class="history-item">
+                    <div class="history-action">{{ item.action }}</div>
+                    <div class="history-meta">
+                        by {{ item.changed_by.get_full_name|default:item.changed_by.username }} &middot; {{ item.timestamp|date:"M d, H:i" }}
+                    </div>
+                </li>
+                {% empty %}
+                <li class="text-muted text-sm">No history records found.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+    </div><!-- /.ticket-sidebar -->
+
+</div>
+{% endblock %}

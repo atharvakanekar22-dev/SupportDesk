@@ -1,0 +1,23 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>403 Forbidden — SupportDesk</title>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+</head>
+<body>
+<div class="error-page">
+    <h1>403</h1>
+    <h2>Access Denied</h2>
+    <p>You do not have permission to access this page.
+       Please contact your administrator if you believe this is an error.</p>
+    {% if user.is_authenticated %}
+        <a href="{% url 'core:dashboard' %}" class="btn btn--secondary">Return to Dashboard</a>
+    {% else %}
+        <a href="{% url 'accounts:login' %}" class="btn btn--primary">Sign In</a>
+    {% endif %}
+</div>
+</body>
+</html>

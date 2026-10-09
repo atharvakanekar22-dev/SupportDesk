@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Create Ticket — SupportDesk{% endblock %}
+{% block page_title %}New Support Ticket{% endblock %}
+
+{% block content %}
+<div style="max-width: 680px; margin: 0 auto;">
+    <div class="page-header" style="margin-bottom: 20px;">
+        <h1>Create a Support Ticket</h1>
+        <p>Please describe your issue with as much detail as possible so our team can assist promptly.</p>
+    </div>
+
+    <div class="card">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="notice notice--error">
+                {{ form.non_field_errors }}
+            </div>
+            {% endif %}
+
+            <div class="form-group">
+                <label for="{{ form.subject.id_for_label }}" class="form-label">
+                    Subject <span style="color: #dc2626;">*</span>
+                </label>
+                {{ form.subject }}
+                {% if form.subject.errors %}
+                <p class="form-error">{{ form.subject.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.priority.id_for_label }}" class="form-label">
+                    Priority <span style="color: #dc2626;">*</span>
+                </label>
+                {{ form.priority }}
+                {% if form.priority.errors %}
+                <p class="form-error">{{ form.priority.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.description.id_for_label }}" class="form-label">
+                    Description <span style="color: #dc2626;">*</span>
+                </label>
+                {{ form.description }}
+                {% if form.description.errors %}
+                <p class="form-error">{{ form.description.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.attachment.id_for_label }}" class="form-label">
+                    Attachment (Optional)
+                </label>
+                {{ form.attachment }}
+                <p class="text-muted text-sm mt-4">{{ form.attachment.help_text }}</p>
+                {% if form.attachment.errors %}
+                <p class="form-error">{{ form.attachment.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-top: 24px; padding-top: 18px; border-top: 1px solid #f1f5f9;">
+                <button type="submit" class="btn btn--primary">
+                    Submit Ticket
+                </button>
+                <a href="{% url 'tickets:ticket_list' %}" class="btn btn--secondary">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
