@@ -1,13 +1,12 @@
 {% extends "base.html" %}
 
 {% block title %}Create Ticket — SupportDesk{% endblock %}
-{% block page_title %}New Support Ticket{% endblock %}
 
 {% block content %}
-<div style="max-width: 680px; margin: 0 auto;">
-    <div class="page-header" style="margin-bottom: 20px;">
+<div class="narrow-page">
+    <div class="page-header">
         <h1>Create a Support Ticket</h1>
-        <p>Please describe your issue with as much detail as possible so our team can assist promptly.</p>
+        <p>Describe the issue with enough detail for the team to start investigating.</p>
     </div>
 
     <div class="card">
@@ -22,7 +21,7 @@
 
             <div class="form-group">
                 <label for="{{ form.subject.id_for_label }}" class="form-label">
-                    Subject <span style="color: #dc2626;">*</span>
+                    Subject <span class="required">*</span>
                 </label>
                 {{ form.subject }}
                 {% if form.subject.errors %}
@@ -32,7 +31,7 @@
 
             <div class="form-group">
                 <label for="{{ form.priority.id_for_label }}" class="form-label">
-                    Priority <span style="color: #dc2626;">*</span>
+                    Priority <span class="required">*</span>
                 </label>
                 {{ form.priority }}
                 {% if form.priority.errors %}
@@ -42,7 +41,7 @@
 
             <div class="form-group">
                 <label for="{{ form.description.id_for_label }}" class="form-label">
-                    Description <span style="color: #dc2626;">*</span>
+                    Description <span class="required">*</span>
                 </label>
                 {{ form.description }}
                 {% if form.description.errors %}
@@ -54,14 +53,16 @@
                 <label for="{{ form.attachment.id_for_label }}" class="form-label">
                     Attachment (Optional)
                 </label>
-                {{ form.attachment }}
-                <p class="text-muted text-sm mt-4">{{ form.attachment.help_text }}</p>
+                <div class="file-drop" data-file-drop>
+                    {{ form.attachment }}
+                    <p class="file-drop__hint" data-file-name>{{ form.attachment.help_text }}</p>
+                </div>
                 {% if form.attachment.errors %}
                 <p class="form-error">{{ form.attachment.errors.0 }}</p>
                 {% endif %}
             </div>
 
-            <div style="display: flex; gap: 12px; margin-top: 24px; padding-top: 18px; border-top: 1px solid #f1f5f9;">
+            <div class="form-actions">
                 <button type="submit" class="btn btn--primary">
                     Submit Ticket
                 </button>

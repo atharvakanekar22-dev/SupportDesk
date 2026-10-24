@@ -1,0 +1,11 @@
+{% if ticket.status == 'OPEN' %}
+    <span class="status-badge status-badge--open">Open</span>
+{% elif ticket.status == 'ASSIGNED' %}
+    <span class="status-badge status-badge--assigned">Assigned</span>
+{% elif ticket.status == 'IN_PROGRESS' %}
+    <span class="status-badge status-badge--inprogress">In Progress</span>
+{% elif ticket.status == 'RESOLVED' %}
+    <span class="status-badge status-badge--resolved">Resolved</span>
+{% elif ticket.status == 'CLOSED' %}
+    <span class="status-badge status-badge--closed">Closed</span>
+{% endif %}
