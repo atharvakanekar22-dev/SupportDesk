@@ -33,17 +33,18 @@
     });
 
     document.addEventListener("keydown", function (event) {
-        if (event.key === "Escape") {
+        if (event.key === "Escape" && body.classList.contains("sidebar-open")) {
             setSidebar(false);
         }
     });
 
     window.addEventListener("resize", function () {
-        if (window.innerWidth > 900) {
+        if (window.innerWidth > 840 && body.classList.contains("sidebar-open")) {
             setSidebar(false);
         }
     });
 
+    // Toast auto-dismiss & close
     document.querySelectorAll("[data-toast]").forEach(function (toast) {
         var close = toast.querySelector("[data-toast-dismiss]");
         var hide = function () {
@@ -57,9 +58,10 @@
         if (close) {
             close.addEventListener("click", hide);
         }
-        window.setTimeout(hide, 7000);
+        window.setTimeout(hide, 6000);
     });
 
+    // Password visibility toggle
     document.querySelectorAll("[data-password-toggle]").forEach(function (button) {
         button.addEventListener("click", function () {
             var field = button.parentElement.querySelector("input");
@@ -71,6 +73,7 @@
         });
     });
 
+    // File dropzone file name reflection
     document.querySelectorAll("[data-file-drop] input[type=file]").forEach(function (input) {
         var nameTarget = input.closest("[data-file-drop]");
         var label = nameTarget ? nameTarget.querySelector("[data-file-name]") : null;

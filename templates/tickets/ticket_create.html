@@ -1,64 +1,81 @@
 {% extends "base.html" %}
 
-{% block title %}Create Ticket — SupportDesk{% endblock %}
+{% block title %}Create Support Ticket — SupportDesk{% endblock %}
 
 {% block content %}
 <div class="narrow-page">
+    <div class="mb-3">
+        <a href="{% url 'tickets:ticket_list' %}" class="back-link">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+            Back to tickets
+        </a>
+    </div>
+
     <div class="page-header">
-        <h1>Create a Support Ticket</h1>
-        <p>Describe the issue with enough detail for the team to start investigating.</p>
+        <h1>Create Support Ticket</h1>
+        <p>Describe your issue or request with sufficient detail for the support team to investigate.</p>
     </div>
 
     <div class="card">
-        <form method="post" enctype="multipart/form-data">
+        <form method="post" enctype="multipart/form-data" novalidate>
             {% csrf_token %}
 
             {% if form.non_field_errors %}
-            <div class="notice notice--error">
-                {{ form.non_field_errors }}
+            <div class="notice notice--error" role="alert">
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
             </div>
             {% endif %}
 
             <div class="form-group">
                 <label for="{{ form.subject.id_for_label }}" class="form-label">
-                    Subject <span class="required">*</span>
+                    Subject <span class="required" aria-hidden="true">*</span>
                 </label>
                 {{ form.subject }}
+                <span class="text-muted text-sm" style="font-size: 11px; margin-top: 3px; display: block;">
+                    A concise, single-line summary of the problem or request.
+                </span>
                 {% if form.subject.errors %}
-                <p class="form-error">{{ form.subject.errors.0 }}</p>
+                <p class="form-error" role="alert">{{ form.subject.errors.0 }}</p>
                 {% endif %}
             </div>
 
             <div class="form-group">
                 <label for="{{ form.priority.id_for_label }}" class="form-label">
-                    Priority <span class="required">*</span>
+                    Priority Tier <span class="required" aria-hidden="true">*</span>
                 </label>
                 {{ form.priority }}
+                <span class="text-muted text-sm" style="font-size: 11px; margin-top: 3px; display: block;">
+                    Low: Routine request &bull; Medium: Standard priority &bull; High: Impaired functionality &bull; Critical: Total system blockage
+                </span>
                 {% if form.priority.errors %}
-                <p class="form-error">{{ form.priority.errors.0 }}</p>
+                <p class="form-error" role="alert">{{ form.priority.errors.0 }}</p>
                 {% endif %}
             </div>
 
             <div class="form-group">
                 <label for="{{ form.description.id_for_label }}" class="form-label">
-                    Description <span class="required">*</span>
+                    Detailed Description <span class="required" aria-hidden="true">*</span>
                 </label>
                 {{ form.description }}
                 {% if form.description.errors %}
-                <p class="form-error">{{ form.description.errors.0 }}</p>
+                <p class="form-error" role="alert">{{ form.description.errors.0 }}</p>
                 {% endif %}
             </div>
 
             <div class="form-group">
                 <label for="{{ form.attachment.id_for_label }}" class="form-label">
-                    Attachment (Optional)
+                    Attachment <span class="text-muted" style="font-weight: 400;">(Optional)</span>
                 </label>
                 <div class="file-drop" data-file-drop>
                     {{ form.attachment }}
-                    <p class="file-drop__hint" data-file-name>{{ form.attachment.help_text }}</p>
+                    <span class="file-drop__hint" data-file-name>{{ form.attachment.help_text }}</span>
                 </div>
                 {% if form.attachment.errors %}
-                <p class="form-error">{{ form.attachment.errors.0 }}</p>
+                <p class="form-error" role="alert">{{ form.attachment.errors.0 }}</p>
                 {% endif %}
             </div>
 

@@ -10,24 +10,19 @@
 </head>
 <body>
 <div class="error-page">
-    <div class="login-logo">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-             viewBox="0 0 24 24" fill="none" stroke="currentColor"
-             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="18" height="18" rx="3"/>
-            <path d="M8 10h8"/>
-            <path d="M8 14h5"/>
-        </svg>
-        SupportDesk
+    <div class="error-card">
+        <span class="error-code-badge">HTTP 403</span>
+        <h1>Access Denied</h1>
+        <p>You do not have the required permissions to view this resource. If you believe this is an error, please contact your SupportDesk administrator.</p>
+        <div class="error-card__actions">
+            {% if user.is_authenticated %}
+                <a href="{% url 'core:dashboard' %}" class="btn btn--primary">Return to Dashboard</a>
+                <a href="{% url 'tickets:ticket_list' %}" class="btn btn--secondary">My Tickets</a>
+            {% else %}
+                <a href="{% url 'accounts:login' %}" class="btn btn--primary">Sign In</a>
+            {% endif %}
+        </div>
     </div>
-    <h1>403</h1>
-    <h2>Access denied</h2>
-    <p>You do not have permission to view this page. If you think this is a mistake, contact an administrator.</p>
-    {% if user.is_authenticated %}
-        <a href="{% url 'core:dashboard' %}" class="btn btn--secondary">Return to Dashboard</a>
-    {% else %}
-        <a href="{% url 'accounts:login' %}" class="btn btn--primary">Sign In</a>
-    {% endif %}
 </div>
 </body>
 </html>

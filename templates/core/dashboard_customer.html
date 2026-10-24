@@ -1,55 +1,68 @@
 {% extends "base.html" %}
 
-{% block title %}Customer Dashboard — SupportDesk{% endblock %}
+{% block title %}Customer Portal — SupportDesk{% endblock %}
 
 {% block content %}
 <div class="page-header page-header--split">
     <div>
         <h1>Welcome, {{ user.get_full_name|default:user.username }}</h1>
-        <p>Monitor your support requests and submit a new ticket when you need help.</p>
+        <p>Monitor your existing support requests or get assistance from our support team.</p>
     </div>
     <a href="{% url 'tickets:ticket_create' %}" class="btn btn--primary">
-        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
         </svg>
-        Create Ticket
+        Submit New Ticket
     </a>
 </div>
 
-<div class="dashboard-grid">
-    <div class="info-panel stat-card">
-        <p class="stat-card__label">Total Requests</p>
+<div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+    <a href="{% url 'tickets:ticket_list' %}" class="stat-card" title="View all my requests">
+        <div class="stat-card__top">
+            <span class="stat-card__label">Total Requests</span>
+        </div>
         <div class="stat-card__value">{{ metrics.total }}</div>
-        <p class="stat-card__hint">All tickets submitted by you</p>
-    </div>
-    <div class="info-panel stat-card">
-        <p class="stat-card__label">In Progress / Pending</p>
-        <div class="stat-card__value stat-card__value--open">{{ metrics.open }}</div>
-        <p class="stat-card__hint">Awaiting response or in resolution</p>
-    </div>
-    <div class="info-panel stat-card">
-        <p class="stat-card__label">Resolved / Closed</p>
-        <div class="stat-card__value stat-card__value--resolved">{{ metrics.resolved }}</div>
-        <p class="stat-card__hint">Successfully resolved issues</p>
-    </div>
+        <span class="stat-card__hint">Lifetime submitted requests</span>
+    </a>
+
+    <a href="{% url 'tickets:ticket_list' %}" class="stat-card" title="View active requests">
+        <div class="stat-card__top">
+            <span class="stat-card__label">
+                <span class="stat-card__pip stat-card__pip--open" aria-hidden="true"></span>
+                Active Requests
+            </span>
+        </div>
+        <div class="stat-card__value">{{ metrics.open }}</div>
+        <span class="stat-card__hint">In triage or active resolution</span>
+    </a>
+
+    <a href="{% url 'tickets:ticket_list' %}?status=RESOLVED" class="stat-card" title="View completed requests">
+        <div class="stat-card__top">
+            <span class="stat-card__label">
+                <span class="stat-card__pip stat-card__pip--resolved" aria-hidden="true"></span>
+                Resolved &amp; Closed
+            </span>
+        </div>
+        <div class="stat-card__value">{{ metrics.resolved }}</div>
+        <span class="stat-card__hint">Completed solutions</span>
+    </a>
 </div>
 
 <div class="section-heading">
-    <h2>Recent Support Tickets</h2>
-    <a href="{% url 'tickets:ticket_list' %}">View all tickets &rarr;</a>
+    <h2>Recent Requests</h2>
+    <a href="{% url 'tickets:ticket_list' %}">View all my tickets &rarr;</a>
 </div>
 
 <div class="table-wrapper">
     <table class="data-table">
         <thead>
             <tr>
-                <th>Ticket #</th>
+                <th style="width: 150px;">Ticket #</th>
                 <th>Subject</th>
-                <th>Assigned Agent</th>
-                <th>Priority</th>
-                <th>Status</th>
-                <th>Created</th>
+                <th style="width: 100px;">Priority</th>
+                <th style="width: 110px;">Status</th>
+                <th style="width: 140px;">Submitted</th>
             </tr>
         </thead>
         <tbody>
@@ -65,13 +78,6 @@
                         {{ ticket.subject }}
                     </a>
                 </td>
-                <td>
-                    {% if ticket.assigned_agent %}
-                        {{ ticket.assigned_agent.get_full_name|default:ticket.assigned_agent.username }}
-                    {% else %}
-                        <span class="text-muted">Unassigned</span>
-                    {% endif %}
-                </td>
                 <td>{% include "tickets/_priority_badge.html" %}</td>
                 <td>{% include "tickets/_status_badge.html" %}</td>
                 <td class="text-muted text-sm">
@@ -80,11 +86,15 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="6">
+                <td colspan="5">
                     <div class="empty-state">
-                        <span class="empty-state__title">No tickets yet</span>
-                        <p>You have not submitted any support tickets yet.</p>
-                        <a href="{% url 'tickets:ticket_create' %}" class="btn btn--primary btn--sm">Create your first ticket</a>
+                        <svg class="empty-state-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="4" width="20" height="16" rx="2"/>
+                            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                        </svg>
+                        <span class="empty-state__title">No support requests yet</span>
+                        <p>Have an issue or inquiry? Create a ticket and our support team will assist you.</p>
+                        <a href="{% url 'tickets:ticket_create' %}" class="btn btn--primary btn--sm">Submit your first ticket</a>
                     </div>
                 </td>
             </tr>
