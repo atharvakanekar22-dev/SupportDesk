@@ -1,67 +1,85 @@
 {% extends "base.html" %}
 
-{% block title %}Create Ticket — SupportDesk{% endblock %}
-{% block page_title %}New Support Ticket{% endblock %}
+{% block title %}Create Support Ticket — SupportDesk{% endblock %}
 
 {% block content %}
-<div style="max-width: 680px; margin: 0 auto;">
-    <div class="page-header" style="margin-bottom: 20px;">
-        <h1>Create a Support Ticket</h1>
-        <p>Please describe your issue with as much detail as possible so our team can assist promptly.</p>
+<div class="narrow-page">
+    <div class="mb-3">
+        <a href="{% url 'tickets:ticket_list' %}" class="back-link">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+            Back to tickets
+        </a>
+    </div>
+
+    <div class="page-header">
+        <h1>Create Support Ticket</h1>
+        <p>Describe your issue or request with sufficient detail for the support team to investigate.</p>
     </div>
 
     <div class="card">
-        <form method="post" enctype="multipart/form-data">
+        <form method="post" enctype="multipart/form-data" novalidate>
             {% csrf_token %}
 
             {% if form.non_field_errors %}
-            <div class="notice notice--error">
-                {{ form.non_field_errors }}
+            <div class="notice notice--error" role="alert">
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
             </div>
             {% endif %}
 
             <div class="form-group">
                 <label for="{{ form.subject.id_for_label }}" class="form-label">
-                    Subject <span style="color: #dc2626;">*</span>
+                    Subject <span class="required" aria-hidden="true">*</span>
                 </label>
                 {{ form.subject }}
+                <span class="text-muted text-sm" style="font-size: 11px; margin-top: 3px; display: block;">
+                    A concise, single-line summary of the problem or request.
+                </span>
                 {% if form.subject.errors %}
-                <p class="form-error">{{ form.subject.errors.0 }}</p>
+                <p class="form-error" role="alert">{{ form.subject.errors.0 }}</p>
                 {% endif %}
             </div>
 
             <div class="form-group">
                 <label for="{{ form.priority.id_for_label }}" class="form-label">
-                    Priority <span style="color: #dc2626;">*</span>
+                    Priority Tier <span class="required" aria-hidden="true">*</span>
                 </label>
                 {{ form.priority }}
+                <span class="text-muted text-sm" style="font-size: 11px; margin-top: 3px; display: block;">
+                    Low: Routine request &bull; Medium: Standard priority &bull; High: Impaired functionality &bull; Critical: Total system blockage
+                </span>
                 {% if form.priority.errors %}
-                <p class="form-error">{{ form.priority.errors.0 }}</p>
+                <p class="form-error" role="alert">{{ form.priority.errors.0 }}</p>
                 {% endif %}
             </div>
 
             <div class="form-group">
                 <label for="{{ form.description.id_for_label }}" class="form-label">
-                    Description <span style="color: #dc2626;">*</span>
+                    Detailed Description <span class="required" aria-hidden="true">*</span>
                 </label>
                 {{ form.description }}
                 {% if form.description.errors %}
-                <p class="form-error">{{ form.description.errors.0 }}</p>
+                <p class="form-error" role="alert">{{ form.description.errors.0 }}</p>
                 {% endif %}
             </div>
 
             <div class="form-group">
                 <label for="{{ form.attachment.id_for_label }}" class="form-label">
-                    Attachment (Optional)
+                    Attachment <span class="text-muted" style="font-weight: 400;">(Optional)</span>
                 </label>
-                {{ form.attachment }}
-                <p class="text-muted text-sm mt-4">{{ form.attachment.help_text }}</p>
+                <div class="file-drop" data-file-drop>
+                    {{ form.attachment }}
+                    <span class="file-drop__hint" data-file-name>{{ form.attachment.help_text }}</span>
+                </div>
                 {% if form.attachment.errors %}
-                <p class="form-error">{{ form.attachment.errors.0 }}</p>
+                <p class="form-error" role="alert">{{ form.attachment.errors.0 }}</p>
                 {% endif %}
             </div>
 
-            <div style="display: flex; gap: 12px; margin-top: 24px; padding-top: 18px; border-top: 1px solid #f1f5f9;">
+            <div class="form-actions">
                 <button type="submit" class="btn btn--primary">
                     Submit Ticket
                 </button>

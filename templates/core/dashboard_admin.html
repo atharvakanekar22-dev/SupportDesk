@@ -1,125 +1,155 @@
 {% extends "base.html" %}
 
-{% block title %}Admin Dashboard — SupportDesk{% endblock %}
-{% block page_title %}System Overview{% endblock %}
+{% block title %}Admin Overview — SupportDesk{% endblock %}
 
 {% block content %}
-<div class="page-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+<div class="page-header page-header--split">
     <div>
-        <h1>Helpdesk Overview</h1>
-        <p>Real-time system metrics, ticket lifecycle status, and incoming queue.</p>
+        <h1>Operational Overview</h1>
+        <p>Live system metrics, ticket triage queues, and recent activity.</p>
     </div>
-    <div>
+    <div style="display: flex; gap: 8px;">
+        <a href="{% url 'tickets:ticket_create' %}" class="btn btn--primary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            New Ticket
+        </a>
         <a href="{% url 'tickets:ticket_list' %}" class="btn btn--secondary">
-            Manage All Tickets
+            View All Tickets
         </a>
     </div>
 </div>
 
-<div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
-    <div class="info-panel">
-        <p class="card-title">Total Tickets</p>
-        <div class="stat-card-num">{{ metrics.total }}</div>
-        <p class="text-muted text-sm mt-4">All time</p>
-    </div>
-    <div class="info-panel">
-        <p class="card-title">Open (Unassigned)</p>
-        <div class="stat-card-num" style="color: #2563eb;">{{ metrics.open }}</div>
-        <p class="text-muted text-sm mt-4">Needs agent assignment</p>
-    </div>
-    <div class="info-panel">
-        <p class="card-title">Assigned</p>
-        <div class="stat-card-num" style="color: #d97706;">{{ metrics.assigned }}</div>
-        <p class="text-muted text-sm mt-4">Awaiting work start</p>
-    </div>
-    <div class="info-panel">
-        <p class="card-title">In Progress</p>
-        <div class="stat-card-num" style="color: #7c3aed;">{{ metrics.in_progress }}</div>
-        <p class="text-muted text-sm mt-4">Active resolution</p>
-    </div>
-    <div class="info-panel">
-        <p class="card-title">Resolved</p>
-        <div class="stat-card-num" style="color: #16a34a;">{{ metrics.resolved }}</div>
-        <p class="text-muted text-sm mt-4">Solution provided</p>
-    </div>
-    <div class="info-panel">
-        <p class="card-title">Closed</p>
-        <div class="stat-card-num" style="color: #64748b;">{{ metrics.closed }}</div>
-        <p class="text-muted text-sm mt-4">Archived & completed</p>
-    </div>
+<div class="dashboard-grid">
+    <a href="{% url 'tickets:ticket_list' %}" class="stat-card" title="View all tickets">
+        <div class="stat-card__top">
+            <span class="stat-card__label">Total Tickets</span>
+        </div>
+        <div class="stat-card__value">{{ metrics.total }}</div>
+        <span class="stat-card__hint">Across all statuses</span>
+    </a>
+
+    <a href="{% url 'tickets:ticket_list' %}?status=OPEN" class="stat-card" title="Filter by Open (Unassigned)">
+        <div class="stat-card__top">
+            <span class="stat-card__label">
+                <span class="stat-card__pip stat-card__pip--open" aria-hidden="true"></span>
+                Open
+            </span>
+        </div>
+        <div class="stat-card__value">{{ metrics.open }}</div>
+        <span class="stat-card__hint">Awaiting agent assignment</span>
+    </a>
+
+    <a href="{% url 'tickets:ticket_list' %}?status=ASSIGNED" class="stat-card" title="Filter by Assigned">
+        <div class="stat-card__top">
+            <span class="stat-card__label">
+                <span class="stat-card__pip stat-card__pip--assigned" aria-hidden="true"></span>
+                Assigned
+            </span>
+        </div>
+        <div class="stat-card__value">{{ metrics.assigned }}</div>
+        <span class="stat-card__hint">Pending investigation start</span>
+    </a>
+
+    <a href="{% url 'tickets:ticket_list' %}?status=IN_PROGRESS" class="stat-card" title="Filter by In Progress">
+        <div class="stat-card__top">
+            <span class="stat-card__label">
+                <span class="stat-card__pip stat-card__pip--progress" aria-hidden="true"></span>
+                In Progress
+            </span>
+        </div>
+        <div class="stat-card__value">{{ metrics.in_progress }}</div>
+        <span class="stat-card__hint">Under active investigation</span>
+    </a>
+
+    <a href="{% url 'tickets:ticket_list' %}?status=RESOLVED" class="stat-card" title="Filter by Resolved">
+        <div class="stat-card__top">
+            <span class="stat-card__label">
+                <span class="stat-card__pip stat-card__pip--resolved" aria-hidden="true"></span>
+                Resolved
+            </span>
+        </div>
+        <div class="stat-card__value">{{ metrics.resolved }}</div>
+        <span class="stat-card__hint">Awaiting customer closure</span>
+    </a>
+
+    <a href="{% url 'tickets:ticket_list' %}?status=CLOSED" class="stat-card" title="Filter by Closed">
+        <div class="stat-card__top">
+            <span class="stat-card__label">
+                <span class="stat-card__pip stat-card__pip--closed" aria-hidden="true"></span>
+                Closed
+            </span>
+        </div>
+        <div class="stat-card__value">{{ metrics.closed }}</div>
+        <span class="stat-card__hint">Archived lifecycle</span>
+    </a>
 </div>
 
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; margin-top: 28px;">
-    <h2 style="font-size: 1rem; font-weight: 600; color: #1e293b;">Recent System Tickets</h2>
-    <a href="{% url 'tickets:ticket_list' %}" style="font-size: 0.85rem; font-weight: 500;">View full table &rarr;</a>
+<div class="section-heading">
+    <h2>Recent Tickets</h2>
+    <a href="{% url 'tickets:ticket_list' %}">View all {{ metrics.total }} tickets &rarr;</a>
 </div>
 
 <div class="table-wrapper">
     <table class="data-table">
         <thead>
             <tr>
-                <th style="width: 140px;">Ticket #</th>
+                <th style="width: 150px;">Ticket #</th>
                 <th>Subject</th>
-                <th>Customer</th>
-                <th>Assigned Agent</th>
-                <th>Priority</th>
-                <th>Status</th>
-                <th style="width: 150px;">Created</th>
+                <th>Requester</th>
+                <th>Assignee</th>
+                <th style="width: 100px;">Priority</th>
+                <th style="width: 110px;">Status</th>
+                <th style="width: 140px;">Created</th>
             </tr>
         </thead>
         <tbody>
             {% for ticket in recent_tickets %}
             <tr>
                 <td>
-                    <a href="{% url 'tickets:ticket_detail' ticket.pk %}" style="font-family: monospace; font-weight: 600;">
+                    <a href="{% url 'tickets:ticket_detail' ticket.pk %}" class="ticket-code">
                         {{ ticket.ticket_number }}
                     </a>
                 </td>
                 <td>
-                    <a href="{% url 'tickets:ticket_detail' ticket.pk %}" style="font-weight: 500; color: #1e293b;">
+                    <a href="{% url 'tickets:ticket_detail' ticket.pk %}" class="ticket-subject-link">
                         {{ ticket.subject }}
                     </a>
                 </td>
-                <td>{{ ticket.customer.get_full_name|default:ticket.customer.username }}</td>
+                <td>
+                    <span style="font-weight: 500;">
+                        {{ ticket.customer.get_full_name|default:ticket.customer.username }}
+                    </span>
+                </td>
                 <td>
                     {% if ticket.assigned_agent %}
-                        {{ ticket.assigned_agent.get_full_name|default:ticket.assigned_agent.username }}
+                        <span style="color: var(--color-text-secondary);">
+                            {{ ticket.assigned_agent.get_full_name|default:ticket.assigned_agent.username }}
+                        </span>
                     {% else %}
-                        <span class="text-muted">Unassigned</span>
+                        <span class="text-muted" style="font-style: italic;">Unassigned</span>
                     {% endif %}
                 </td>
-                <td>
-                    {% if ticket.priority == 'LOW' %}
-                        <span class="priority-badge priority-badge--low">Low</span>
-                    {% elif ticket.priority == 'MEDIUM' %}
-                        <span class="priority-badge priority-badge--medium">Medium</span>
-                    {% elif ticket.priority == 'HIGH' %}
-                        <span class="priority-badge priority-badge--high">High</span>
-                    {% elif ticket.priority == 'CRITICAL' %}
-                        <span class="priority-badge priority-badge--critical">Critical</span>
-                    {% endif %}
-                </td>
-                <td>
-                    {% if ticket.status == 'OPEN' %}
-                        <span class="status-badge status-badge--open">Open</span>
-                    {% elif ticket.status == 'ASSIGNED' %}
-                        <span class="status-badge status-badge--assigned">Assigned</span>
-                    {% elif ticket.status == 'IN_PROGRESS' %}
-                        <span class="status-badge status-badge--inprogress">In Progress</span>
-                    {% elif ticket.status == 'RESOLVED' %}
-                        <span class="status-badge status-badge--resolved">Resolved</span>
-                    {% elif ticket.status == 'CLOSED' %}
-                        <span class="status-badge status-badge--closed">Closed</span>
-                    {% endif %}
-                </td>
+                <td>{% include "tickets/_priority_badge.html" %}</td>
+                <td>{% include "tickets/_status_badge.html" %}</td>
                 <td class="text-muted text-sm">
                     {{ ticket.created_at|date:"M d, Y H:i" }}
                 </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="7" style="text-align: center; padding: 36px 20px; color: #64748b;">
-                    No tickets currently in the system.
+                <td colspan="7">
+                    <div class="empty-state">
+                        <svg class="empty-state-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="4" width="20" height="16" rx="2"/>
+                            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                        </svg>
+                        <span class="empty-state__title">No tickets recorded</span>
+                        <p>No support tickets exist in the system yet.</p>
+                        <a href="{% url 'tickets:ticket_create' %}" class="btn btn--primary btn--sm">Create Ticket</a>
+                    </div>
                 </td>
             </tr>
             {% endfor %}

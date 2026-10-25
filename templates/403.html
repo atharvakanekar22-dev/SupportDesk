@@ -5,19 +5,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>403 Forbidden — SupportDesk</title>
+    <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
 </head>
 <body>
 <div class="error-page">
-    <h1>403</h1>
-    <h2>Access Denied</h2>
-    <p>You do not have permission to access this page.
-       Please contact your administrator if you believe this is an error.</p>
-    {% if user.is_authenticated %}
-        <a href="{% url 'core:dashboard' %}" class="btn btn--secondary">Return to Dashboard</a>
-    {% else %}
-        <a href="{% url 'accounts:login' %}" class="btn btn--primary">Sign In</a>
-    {% endif %}
+    <div class="error-card">
+        <span class="error-code-badge">HTTP 403</span>
+        <h1>Access Denied</h1>
+        <p>You do not have the required permissions to view this resource. If you believe this is an error, please contact your SupportDesk administrator.</p>
+        <div class="error-card__actions">
+            {% if user.is_authenticated %}
+                <a href="{% url 'core:dashboard' %}" class="btn btn--primary">Return to Dashboard</a>
+                <a href="{% url 'tickets:ticket_list' %}" class="btn btn--secondary">My Tickets</a>
+            {% else %}
+                <a href="{% url 'accounts:login' %}" class="btn btn--primary">Sign In</a>
+            {% endif %}
+        </div>
+    </div>
 </div>
 </body>
 </html>

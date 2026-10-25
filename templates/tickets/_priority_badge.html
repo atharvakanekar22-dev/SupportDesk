@@ -1,0 +1,9 @@
+{% if ticket.priority == 'LOW' %}
+    <span class="priority-badge priority-badge--low">Low</span>
+{% elif ticket.priority == 'MEDIUM' %}
+    <span class="priority-badge priority-badge--medium">Medium</span>
+{% elif ticket.priority == 'HIGH' %}
+    <span class="priority-badge priority-badge--high">High</span>
+{% elif ticket.priority == 'CRITICAL' %}
+    <span class="priority-badge priority-badge--critical">Critical</span>
+{% endif %}

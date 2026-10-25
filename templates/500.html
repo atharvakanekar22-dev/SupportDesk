@@ -1,0 +1,23 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>500 Internal Server Error — SupportDesk</title>
+    <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+</head>
+<body>
+<div class="error-page">
+    <div class="error-card">
+        <span class="error-code-badge">HTTP 500</span>
+        <h1>Server Error</h1>
+        <p>The application encountered an unexpected internal error. The incident has been recorded and the engineering team has been alerted.</p>
+        <div class="error-card__actions">
+            <a href="/" class="btn btn--primary">Return to SupportDesk</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>
